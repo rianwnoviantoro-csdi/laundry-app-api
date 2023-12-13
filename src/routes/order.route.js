@@ -8,6 +8,6 @@ const orderRoute = express.Router();
 
 orderRoute.post("/", auth, createRules, validator, createNew);
 orderRoute.get("/", auth, list);
-orderRoute.get("/:id", auth, show);
+orderRoute.get("/:id", show);
 
 export default orderRoute;
