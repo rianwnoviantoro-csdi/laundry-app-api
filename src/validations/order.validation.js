@@ -29,11 +29,11 @@ const createRules = [
   body("payment_at")
     .optional()
     .isDate()
-    .withMessage("Payment_at must be a integer"),
+    .withMessage("Payment_at must be a date"),
   body("pickup_at")
     .optional()
     .isDate()
-    .withMessage("Pickup_at must be a integer"),
+    .withMessage("Pickup_at must be a date"),
 ];
 
 export { createRules };
