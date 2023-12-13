@@ -21,7 +21,7 @@ const createRules = [
     .withMessage("Weight is required")
     .isFloat()
     .withMessage("Weight must be a float"),
-  body("discount").optional().isInt().withMessage("discount must be a integer"),
+  body("discount").optional().isInt({ max: 100 }).withMessage("discount must be a integer and not exceed 100"),
   body("status")
     .notEmpty()
     .isBoolean()
