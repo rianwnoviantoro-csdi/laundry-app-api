@@ -5,6 +5,7 @@ import Service from "../models/service.model.js";
 import Customer from "../models/customer.model.js";
 import Parfume from "../models/parfume.model.js";
 import User from "../models/user.model.js";
+import { countRecords, fetchRecords } from "../helpers/pagination.helper.js";
 
 export const createNew = async (req, res) => {
   try {
@@ -100,27 +101,48 @@ export const createNew = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    return res
-      .status(200)
-      .json({
-        message: "Success.",
-        data: await Order.findAll({
-          attributes: [
-            "id",
-            "number",
-            "weight",
-            "discount",
-            "sub_total",
-            "pay",
-            "status",
-            "finish_at",
-            "payment_at",
-            "pickup_at",
-            "created_at",
-            "updated_at",
-          ],
-        }),
-      });
+    const {
+      pageSize = 10,
+      page = 1,
+      orderBy = "createdAt",
+      order = "DESC",
+    } = req.query;
+
+    const condition = {};
+
+    const totalRecords = await countRecords(Order, condition);
+    const services = await fetchRecords(Order, {
+      condition,
+      orderBy,
+      order,
+      pageSize,
+      page,
+    });
+
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const meta = {
+      totalRecords,
+      totalPages,
+      page: parseInt(page),
+    };
+
+    const links = {
+      next:
+        parseInt(page) < totalPages
+          ? `/order?page=${parseInt(page) + 1}`
+          : null,
+      prev: parseInt(page) > 1 ? `/order?page=${page - 1}` : null,
+    };
+
+    return res.status(200).json({
+      message: "Success.",
+      data: {
+        services,
+        meta,
+        links,
+      },
+    });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Something went wrong." });

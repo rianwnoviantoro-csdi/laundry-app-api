@@ -1,3 +1,4 @@
+import { countRecords, fetchRecords } from "../helpers/pagination.helper.js";
 import Category from "../models/category.model.js";
 
 export const createNew = async (req, res) => {
@@ -21,9 +22,48 @@ export const createNew = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    return res
-      .status(200)
-      .json({ message: "Success.", data: await Category.findAll() });
+    const {
+      pageSize = 10,
+      page = 1,
+      orderBy = "createdAt",
+      order = "DESC",
+    } = req.query;
+
+    const condition = {};
+
+    const totalRecords = await countRecords(Category, condition);
+    const services = await fetchRecords(Category, {
+      condition,
+      orderBy,
+      order,
+      pageSize,
+      page,
+    });
+
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const meta = {
+      totalRecords,
+      totalPages,
+      page: parseInt(page),
+    };
+
+    const links = {
+      next:
+        parseInt(page) < totalPages
+          ? `/category?page=${parseInt(page) + 1}`
+          : null,
+      prev: parseInt(page) > 1 ? `/category?page=${page - 1}` : null,
+    };
+
+    return res.status(200).json({
+      message: "Success.",
+      data: {
+        services,
+        meta,
+        links,
+      },
+    });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Something went wrong." });
