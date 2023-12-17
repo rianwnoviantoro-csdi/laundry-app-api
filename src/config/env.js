@@ -1,6 +1,7 @@
-import 'dotenv/config'
+import "dotenv/config";
 
 export const config = {
+  FE_URL: process.env.FE_URL,
   APP_ENV: process.env.APP_ENV,
   APP_PORT: process.env.APP_PORT,
   DB_HOST: process.env.DB_HOST,

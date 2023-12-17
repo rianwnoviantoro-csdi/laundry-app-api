@@ -1,6 +1,11 @@
 import { body } from "express-validator";
 
 const createRules = [
+  body("category")
+    .notEmpty()
+    .withMessage("Category is required")
+    .isString()
+    .withMessage("Category must be a string"),
   body("name")
     .notEmpty()
     .withMessage("Name is required")
