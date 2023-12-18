@@ -5,12 +5,14 @@ import cors from 'cors'
 import { sequelize } from "./models/index.model.js";
 import { config } from "./config/env.js";
 import router from "./routes/index.route.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = config.APP_PORT || 3000;
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 const corsOptions = {
     origin: config.FE_URL,

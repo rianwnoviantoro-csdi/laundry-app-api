@@ -10,5 +10,7 @@ export const config = {
   DB_NAME: process.env.DB_NAME,
   DB_PASS: process.env.DB_PASS,
   SECRET: process.env.SECRET,
+  REFRESH: process.env.REFRESH,
   EXP: process.env.EXP,
+  REFRESH_EXP: process.env.REFRESH_EXP,
 };

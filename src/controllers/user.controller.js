@@ -62,7 +62,68 @@ export const login = async (req, res) => {
       expiresIn: config.EXP,
     });
 
+    const refreshToken = jwt.sign(tokenPayload, config.REFRESH, {
+      expiresIn: config.REFRESH_EXP,
+    });
+
+    res.cookie("jwt", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 7 * 24 * 10 * 60 * 1000,
+    });
+
     return res.status(200).json({ message: "Success.", data: { token } });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Something went wrong." });
+  }
+};
+
+export const refresh = async (req, res) => {
+  try {
+    const { jwt: token } = req.cookies;
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const decoded = jwt.verify(token, config.REFRESH);
+
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const existUser = await User.findOne({ where: { id: decoded.id } });
+
+    if (!decoded) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const payload = {
+      id: existUser.id,
+      name: existUser.name,
+    };
+
+    const accessToken = jwt.sign(payload, config.SECRET, {
+      expiresIn: config.EXP,
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Success.", data: { token: accessToken } });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Something went wrong." });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
+
+    return res.status(200).json({ message: "Success.", data: [] });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Something went wrong." });
